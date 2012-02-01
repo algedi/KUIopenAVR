@@ -1,0 +1,575 @@
+#! /bin/bash
+  
+####################################################
+########                                    ########
+######         OpenTools for ATMEL            ######
+######                                        ######
+######  ------------------------------------  ######
+######                                        ######
+######            License: GPLv2              ######
+######      Algedi project: algedi@tin.it     ######
+######                                        ######
+######  ------------------------------------  ######
+######                                        ######
+######        KK   KK  UU      UU  II         ######
+######        KK  KK   UU      UU  II         ######
+######        KK KK    UU      UU  II         ######
+######        KKKK     UU      UU  II         ######
+######        KK KK    UU      UU  II         ######
+######        KK  KK    UU    UU   II         ######
+######        KK   KK     UUUU     II         ######
+######                                        ######
+####################################################
+
+source .preference.conf
+
+PRINT_OUT=""
+
+#########################
+# DISPLAY terminal INFO #
+#########################
+
+function info {
+	clear
+	logo
+	echo
+	echo "Project: $PROJECT"
+	echo "********************************************************"
+	echo "CIRCUITO:   $HARDWARE_TYPE"
+	echo "--------------------------------------------------------"
+	echo "    MCU:            $MCU (Signa per il compilatore)"
+	echo "    FREQUENZA:      $F_CPU (Hz)"
+	echo "    CHIP :          $AVRDUDE_MCU (Sigla per ARVDUDE)"
+	echo "    PROGRAMMATORE:  $PROGRAMMER (Interfaccia-scheda)"
+	echo "*********************************************************"
+}
+
+#########################
+# DISPLAY terminal LOGO #
+#########################
+
+function logo {
+	clear
+	echo
+	echo "OOOOOOOOOOOOOOOOOOOOOOOOOO"
+	echo "OO  OO  OOOO  OO  OOOO  OO"
+	echo "OO  O  OOOOO  OO  OOOO  OO"
+	echo "OO   OOOOOOO  OO  OOOO  OO"
+	echo "OO  O  OOOOO  OO  OOOO  OO"
+	echo "OO  OO  OOOOO    OOOOO  OO"
+	echo "OOOOOOOOOOOOOOOOOOOOOOOOOO"
+	echo
+	echo
+}
+
+######################################
+# MENU PRINCIPALE                    #
+######################################
+
+function menu_main {
+	ACTION=$(zenity --list --height=300 --width=400 \
+				--title="KUI - Tools for ATMEL programmer" \
+				--column="" \
+				"Apri ..." \
+				"Nuovo ..." \
+				"Elimina ..." \
+				"    Preferenze ..." \
+				"    Manuale ..." \
+				"Esci")
+
+
+	# --------------------------------------------- Apri
+	if [ "$ACTION" = "Apri ..." ]; then
+		cd projects
+		DIR_PRJS=""
+		for DIR_PRJ in *
+		do
+			if [ -d $DIR_PRJ ] 
+				then DIR_PRJS="${DIR_PRJS} ${DIR_PRJ}"
+			fi
+		done
+		cd ..
+		ACTION=$(zenity --list --height=300 --width=400 \
+					--title="KUI - Open - ATMEL programmer" \
+					--column="Seleziona un progetto:" \
+					$DIR_PRJS )
+		if [ "$ACTION" != "" ]; then
+			DIR_PRJ=projects/$ACTION
+			menu_progetto
+		fi
+	fi
+
+	# --------------------------------------------- NUOVO
+	if [ "$ACTION" = "Nuovo ..." ]; then
+		PRJ=$(zenity --entry --title="Nome del nuovo progetto" \
+			--text="Inserisci il nome del nuovo progetto:" \
+			--entry-text="nuovo_progetto")
+		if [ $PRJ != "" ]; then
+				cp -R projects/.prototype projects/$PRJ
+		fi
+		DIR_PRJ=projects/$PRJ
+		menu_progetto
+	fi
+
+	# --------------------------------------------- MANUALE
+	if [ "$ACTION" = "    Manuale ..." ]; then
+		cd man
+		MANS=""
+		for MAN in *
+		do
+			if [ -f $MAN ] ;then 
+				MANS="$MANS $MAN"
+			fi
+		done
+		cd ..
+		ACTION=$(zenity --list --height=300 --width=400 \
+					--title="KUI - Open - ATMEL programmer" \
+					--column="Manuale" --separator="§"\
+					$MANS )
+		if [ "$ACTION" != "" ]; then
+			zenity --text-info --width=700 --height=400 \
+				--title="$ACTION" --filename="man/$ACTION"
+		fi
+	fi
+
+	# --------------------------------------------- ESCI
+	if [ "$ACTION" = "Esci" ]; then
+		logo
+		echo
+		echo
+		echo " #############"
+		echo " # GAME OVER #"
+		echo " #############"
+		echo
+		echo
+		exit
+	fi
+}
+
+#############
+# MENU APRI #
+#############
+
+function menu_progetto {
+	logo
+	source $DIR_PRJ/project.conf
+	PRINT_OUT="nessuna"
+	while [ true ]
+	do
+		logo
+		ACTION=$(zenity --list --height=350 --width=500 \
+					--title="KUI - Open-AVR - ATMEL programmer" \
+					--column="$PROJECT" \
+					"Modifica sorgente ..." \
+					"Modifica progetto ..." \
+					"Aggiungi librerie ..." \
+					"    Pulisci" \
+					"    Compila" \
+					"    Scrivi il chip" \
+					"    Scrivi i fuse (attenzione)" \
+					"    Test with terminal" \
+					"Esci")
+
+		# --------------------------------------------- Modifica sorgente ...
+		if [ "$ACTION" = "Modifica sorgente ..." ]; then
+			menu_mod_src
+		fi
+
+		# --------------------------------------------- Modifica progetto ...
+		if [ "$ACTION" = "Modifica progetto ..." ]; then
+			menu_mod_prj
+		fi
+
+		# --------------------------------------------- Aggiungi librerie ...
+		if [ "$ACTION" = "Aggiungi librerie ..." ]; then
+			menu_add_lib
+		fi
+
+		# --------------------------------------------- PULISCI
+		if [ "$ACTION" = "    Pulisci" ]; then
+			cd $DIR_PRJ
+			make clean
+			cd ..
+			cd ..
+			zenity --info --title="Operazione terminata" --text="Ora le directory obj e out sono vuote"
+		fi
+
+		# --------------------------------------------- COMPILA
+		if [ "$ACTION" = "    Compila" ]; then
+			cd $DIR_PRJ
+			echo ">> COMPILAZIONE: inizio" > out.log
+			make out/main.hex >> out.log
+			if [ $? -eq 0 ]; then
+				echo "<< COMPILAZIONE: finita" >> out.log
+				zenity --text-info --width=500 --height=400 \
+					--title="Operazione terminata" --filename="out.log"
+			else
+				echo "*** Errore: compilazione interrotta" >> out.log
+				zenity --text-info --width=500 --height=400 \
+					--title="ERRORE: compilazione interrotta" --filename="out.log"
+			fi
+			cd ..
+			cd ..
+		fi
+
+		# --------------------------------------------- SCRIVI IL CHIP ...
+		if [ "$ACTION" = "    Scrivi il chip" ]; then
+			cd $DIR_PRJ
+			echo ">> SCRITTURA CHIP: inizio" > out.log
+			make >> out.log
+			if [ $? -eq 0 ]; then
+				echo "<< SCRITTURA CHIP: finito"
+				zenity --text-info --width=800 --height=300 \
+					--title="Operazione terminata" --filename="out.log"
+			else
+				zenity --text-info --width=800 --height=300 \
+					--title="ERRORE: scrittura del chip interrotta" --filename="out.log"
+			fi
+			cd ..
+			cd ..
+		fi
+
+		# --------------------------------------------- SCRIVI I FUSE
+		if [ "$ACTION" = "    Scrivi i fuse (attenzione)" ]; then
+			zenity --question --text="Sei sicuro?"
+			if [ $? -eq 0 ]; then
+				cd $DIR_PRJ
+				echo ">> SCRITTURA FUSE: inizio" > out.log
+				if [ $FUSE_H != "" ]; then			
+					make fuse_h >> out.log
+				fi
+				if [ $FUSE_L != "" ]; then			
+					make fuse_l >> out.log
+				fi
+				if [ $FUSE_X != "" ]; then			
+					make fuse_x >> out.log
+				fi
+				echo "<< SCRITTURA CHIP: finito" >> out.log
+				zenity --text-info --width=800 --height=300 \
+					--title="Operazione terminata" --filename="out.log"
+				cd ..
+				cd ..
+			fi
+		fi
+
+		# --------------------------------------------- Test with terminal
+		if [ "$ACTION" = "    Test with terminal" ]; then
+			xterm -e screen /dev/ttyUSB0 9600
+		fi
+
+		# --------------------------------------------- Esci
+		if [ "$ACTION" = "Esci" ]; then
+			ACTION="xxxxxx"
+			return
+		fi
+	done
+}
+
+##########################
+# MODIFICA PROGETTO LOOP #
+##########################
+
+function menu_mod_prj {
+
+	logo
+	LOOP_EXIT="true"
+	while [ $LOOP_EXIT = "true" ]; do
+		ACTION=$(zenity --list --height=500 --width=450 \
+				--title="KUI - Open-AVR - ATMEL programmer" \
+				--print-column=1 --column="parametro" --column="valore" \
+				"NOME PROGETTO" " $PROJECT" \
+				"    MICROCONTROLLORE" " $MCU" \
+				"    FREQUENZA" " $F_CPU" \
+				"    CHIP (sigla)" " $AVRDUDE_MCU" \
+				"    PROGRAMMATORE" " $PROGRAMMER" \
+				"    SERIAL PORT" " $SERIAL_PORT" \
+				"    SERIAL BAUD" " $SERIAL_BAUD" \
+				"    FUSE H" " $FUSE_H" \
+				"    FUSE L" " $FUSE_L" \
+				"    FUSE X" " $FUSE_X" \
+				"Circuiti" "(parametri di alcune schede)" \
+				"Salva" "" \
+				"Esci" ""
+			)
+
+		# --------------------------------------------- NOME DEL PROGETTO
+		if [ "$ACTION" = "NOME PROGETTO" ]; then
+			PROJECT=$(zenity --entry --width=400 --title="Nome del progetto" \
+				--text="Inserisci il nome del progetto:" \
+				--entry-text="$PROJECT")
+		fi
+
+		# --------------------------------------------- MICROCONTROLLORE
+		if [ "$ACTION" = "    MICROCONTROLLORE" ]; then
+			MCU=$(zenity --list --height=300 --width=400 \
+						--title="Selezionare il microcontrollore" --print-column=1 \
+						--column="sigla" $MCU_NAMES)
+		fi
+
+		# --------------------------------------------- FREQUENZA
+		if [ "$ACTION" = "    FREQUENZA" ]; then
+			F_CPU=$(zenity --list --height=300 --width=400 \
+				--title="Selezionare la frequenza del clock" \
+				--print-column=1 --column="valore" --column="descrizione" \
+				"16000000UL" "16 MHz" \
+				"12000000UL" "12 MHz" \
+				"10000000UL" "10 MHz" \
+				"8000000UL" " 8MHz" \
+				"4000000UL" " 4MHz" \
+				"utente" "..." \
+			)
+			if [ "$F_CPU" = "utente" ]; then
+				F_CPU=$(zenity --entry --title="Frequenza in Hz" \
+					--text="Digitare la frequenza:" \
+					--entry-text="1000000")"UL"
+			fi
+		fi
+
+		# --------------------------------------------- CHIP
+		if [ "$ACTION" = "    CHIP (sigla)" ]; then
+			AVRDUDE_MCU=$(zenity --list --height=300 --width=400 \
+						--title="Selezionare il chip" --print-column=1 \
+						--column="sigla" --column="CHIP" $CHIP_NAMES)
+		fi
+
+		# --------------------------------------------- PROGRAMMATORE
+		if [ "$ACTION" = "    PROGRAMMATORE" ]; then
+			PROGRAMMER=$(zenity --list --height=300 --width=400 \
+						--title="Selezionare il programmatore" --print-column=1 \
+						--column="sigla" --column="CHIP" $PROGRAMMER_NAMES)
+		fi
+
+		# --------------------------------------------- SERIAL_BAUD
+		if [ "$ACTION" = "    SERIAL BAUD" ]; then
+			SERIAL_BAUD=$(zenity --list --height=300 --width=400 \
+				--title="Velocita' posta seriale (baud)" \
+				--print-column=1 --column="valore" \
+				"76800" \
+				"57600" \
+				"38400" \
+				"19200" \
+				"9600" \
+				"utente"
+			)
+			if [ "$SERIAL_BAUD" = "utente" ]; then
+				SERIAL_BAUD=$(zenity --entry --title="Velocita' porta seriale" \
+					--text="Digitare la frequenza in BAUD:" \
+					--entry-text="19200")
+			fi
+		fi
+
+		# --------------------------------------------- FUSE_H
+		if [ "$ACTION" = "    FUSE H" ]; then
+			YES_NO=$(zenity --question --text="Vuoi leggere il valore dal CHIP ?")
+			if [ "$?" = 1 ]; then
+				FUSE_H=$(zenity --entry --title="Valore del FUSE H" \
+					--text="Digitare il valore in formato hex (0xFF):" \
+					--entry-text=$FUSE_H)
+			else
+				cd $DIR_PRJ
+				make read_fuse_h
+				FUSE_H=`cat out.txt` 
+				rm out.txt
+				cd ..
+				cd ..
+			fi
+		fi
+
+		# --------------------------------------------- FUSE_L
+		if [ "$ACTION" = "    FUSE L" ]; then
+			$(zenity --question --text="Vuoi leggere il valore dal CHIP ?")
+			if [ "$?" = 1 ]; then
+				FUSE_L=$(zenity --entry --title="Valore del FUSE L" \
+					--text="Digitare il valore in formato hex (es.0xFF):" \
+					--entry-text=$FUSE_L)
+			else
+				cd $DIR_PRJ
+				make read_fuse_l
+				FUSE_L=`cat out.txt` 
+				rm out.txt
+				cd ..
+				cd ..
+			fi
+		fi
+
+		# --------------------------------------------- FUSE_H
+		if [ "$ACTION" = "    FUSE X" ]; then
+			$(zenity --question --text="Vuoi leggere il valore dal CHIP ?")
+			if [ "$?" = 1 ]; then
+				FUSE_X=$(zenity --entry --title="Valore del FUSE X" \
+					--text="Digitare il valore in formato hex (0xFF):" \
+					--entry-text=$FUSE_X)
+			else
+				cd $DIR_PRJ
+				make read_fuse_x
+				FUSE_X=`cat out.txt` 
+				rm out.txt
+				cd ..
+				cd ..
+			fi
+		fi
+
+		# --------------------------------------------- SERIAL_PORT
+		if [ "$ACTION" = "    SERIAL PORT" ]; then
+			SERIAL_PORT=$(zenity --list --height=300 --width=400 \
+				--title="Porta seriale (virtual USB)" \
+				--print-column=1 --column="valore" \
+				"/dev/ttyUSB0" \
+				"/dev/ttyUSB1" \
+				"/dev/ttyUSB2" \
+				"/dev/ttyS0" \
+				"/dev/ttyS1" \
+				"utente"
+			)
+			if [ "$SERIAL_PORT" = "utente" ]; then
+				SERIAL_PORT=$(zenity --entry --title="Porta seriale" \
+					--text="Digitare il nome:" \
+					--entry-text="/dev/ttyUSB0")
+			fi
+		fi
+
+		# --------------------------------------------- CIRCUITI
+		if [ "$ACTION" = "Circuiti" ]; then
+			cd hardware
+			FILES=""
+			for FILE in *; do
+				FILES="$FILES $FILE"
+			done
+			cd ..
+			FILE=$(zenity --list --height=300 --width=400 \
+				--title="Selezionare il circuito" \
+				--print-column=1 --column="" \
+				$FILES
+				)
+			source ./hardware/$FILE
+		fi
+
+		# --------------------------------------------- SALVA
+		if [ "$ACTION" = "Salva" ]; then
+			echo 
+			echo 'export PROJECT="'$PROJECT'"' > $DIR_PRJ/project.conf
+			echo 'export HARDWARE_TYPE="'$HARDWARE_TYPE'"' >> $DIR_PRJ/project.conf
+			echo 'export MCU="'$MCU'"' >> $DIR_PRJ/project.conf
+			echo 'export F_CPU="'$F_CPU'"' >> $DIR_PRJ/project.conf
+			echo 'export PROGRAMMER="'$PROGRAMMER'"' >> $DIR_PRJ/project.conf
+			echo 'export SERIAL_BAUD="'$SERIAL_BAUD'"' >> $DIR_PRJ/project.conf
+			echo 'export SERIAL_PORT="'$SERIAL_PORT'"' >> $DIR_PRJ/project.conf
+			echo 'export AVRDUDE_MCU="'$AVRDUDE_MCU'"' >> $DIR_PRJ/project.conf
+			echo 'export DEBUG="'$DEBUG'"' >> $DIR_PRJ/project.conf
+			echo 'export FUSE_H="'$FUSE_H'"' >> $DIR_PRJ/project.conf
+			echo 'export FUSE_L="'$FUSE_L'"' >> $DIR_PRJ/project.conf
+			echo 'export FUSE_X="'$FUSE_X'"' >> $DIR_PRJ/project.conf
+			LOOP_EXIT="false"
+		fi
+		# --------------------------------------------- ESCI
+		if [ "$ACTION" = "Esci" ]; then
+			source $DIR_PRJ/project.conf
+			LOOP_EXIT="false"
+			ACTION="xxxxxx"
+		fi
+	done
+	LOOP_EXIT="true"
+}
+
+#####################
+# MODIFICA SORGENTE #
+#####################
+
+function menu_mod_src {
+	cd $DIR_PRJ
+	cd src
+	SRCS=
+	for SRC in *
+	do
+		if [ -f $SRC ] 
+			then SRCS="${SRC} ${SRCS}"
+		fi
+	done
+	cd ..
+	cd ..
+	cd ..
+
+	ACTION=$(zenity --list --height=310 --width=450 \
+			--title="FILE SORGENTE" \
+			--column="---" \
+			$SRCS \
+			"    Esci"
+		)
+
+	# --------------------------------------------- NOME DEL PROGETTO
+	if [ "$ACTION" = "    Esci" ]; then
+		return
+	fi
+
+	if [ "$ACTION" != "" ]; then
+		(gedit ${DIR_PRJ}/src/$ACTION &)
+	fi
+}
+
+
+#####################
+# AGGIUNGI LIBRERIE #
+#####################
+
+function menu_add_lib {
+	LIB_DIR="lib"
+
+	while [ "true" = "true" ]
+	do
+		DIR_WORK=$PWD
+		cd $LIB_DIR
+		LIBS=
+		for LIB_IN in *
+		do
+			if [ -d $LIB_IN ] 
+				then LIBS="${LIB_IN} ${LIBS}"
+			fi
+		done
+		cd $DIR_WORK
+
+		ACTION=$(zenity --list --height=310 --width=450 \
+				--title="GESTIONE LIBRERIE" \
+				--column=$DIR_WORK/$LIB_DIR \
+				$LIBS \
+				"    Azzera librerie" \
+				"    Esci"
+			)
+
+		# --------------------------------------------- AZZERA
+		if [ "$ACTION" = "    Azzera librerie" ]; then
+			rm $DIR_PRJ/lib/*
+			rm $DIR_PRJ/include/*
+			return
+		fi
+		# --------------------------------------------- ESCI
+		if [ "$ACTION" = "    Esci" ]; then
+			return
+		fi
+
+		if [ "$ACTION" != "" ]; then
+			LIB_DIR=$LIB_DIR/$ACTION
+			LIB_IN_CHECK="false"
+			DIR_WORK=$PWD
+			cd $LIB_DIR
+			for LIB_IN in *
+			do
+				if [ -d $LIB_IN ]; then 
+					LIB_IN_CHECK="true"
+				fi
+			done
+			cd $DIR_WORK
+			if [ "$LIB_IN_CHECK" = "false" ]; then
+				cp $LIB_DIR/*.c $DIR_PRJ/lib
+				cp $LIB_DIR/*.cpp $DIR_PRJ/lib
+				cp $LIB_DIR/*.h $DIR_PRJ/include
+				return
+			fi
+		fi
+	done
+}
+
+chmod +x .menu
+while [ true ]; do
+	logo
+	menu_main
+done

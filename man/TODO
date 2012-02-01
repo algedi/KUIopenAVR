@@ -1,0 +1,9 @@
+Problema degli spazi nei nome delle dir o file per elenchi zenity --list
+
+
+MENU PRINCIPALE
+	Elimina
+		elenco progetti con msgbox finale SI e NO
+	Preferenze
+		Raccolta di variavili del programma
+			esempio: editor di testo di default

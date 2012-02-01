@@ -1,0 +1,8 @@
+>> COMPILAZIONE: inizio
+	>>	compile cpp source: start
+In file included from src/main.cpp:23:
+./include/SD.h:26: error: expected class-name before ‘{’ token
+src/main.cpp: In function ‘int main()’:
+src/main.cpp:48: warning: deprecated conversion from string constant to ‘char*’
+src/main.cpp:54: error: ‘class File’ has no member named ‘println’
+src/main.cpp:66: warning: deprecated conversion from string constant to ‘char*’

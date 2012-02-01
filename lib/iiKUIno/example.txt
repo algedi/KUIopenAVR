@@ -1,0 +1,199 @@
+// *****************************
+// * MASTER READ - SLAVE WRITE *
+// *****************************
+
+// ****** Code for Master Reader ******
+#include <Wire.h>
+
+void setup()
+{
+  Wire.begin();        // join i2c bus (address optional for master)
+  Serial.begin(9600);  // start serial for output
+}
+
+void loop()
+{
+  Wire.requestFrom(2, 6);    // request 6 bytes from slave device #2
+  while(Wire.available())    // slave may send less than requested
+  {
+    char c = Wire.receive(); // receive a byte as character
+    Serial.print(c);         // print the character
+  }
+  delay(500);
+}
+
+// ****** Code for Slave Sender ******
+#include <Wire.h>
+
+void setup()
+{
+  Wire.begin(2);                // join i2c bus with address #2
+  Wire.onRequest(requestEvent); // register event
+}
+
+void loop()
+{
+  delay(100);
+}
+
+void requestEvent()
+{
+  Wire.send("hello "); // respond with message of 6 bytes
+}
+
+// *****************************
+// * MASTER WRITE - SLAVE READ *
+// *****************************
+
+// ****** Master Writer
+#include <Wire.h>
+void setup()
+{
+  Wire.begin(); // join i2c bus (address optional for master)
+}
+byte x = 0;
+void loop()
+{
+  Wire.beginTransmission(4); // transmit to device #4
+  Wire.send("x is ");        // sends five bytes
+  Wire.send(x);              // sends one byte  
+  Wire.endTransmission();    // stop transmitting
+  x++;
+  delay(500);
+}
+// ****** Slave Receiver Code ******
+#include <Wire.h>
+void setup()
+{
+  Wire.begin(4);                // join i2c bus with address #4
+  Wire.onReceive(receiveEvent); // register event
+  Serial.begin(9600);           // start serial for output
+}
+void loop()
+{
+  delay(100);
+}
+void receiveEvent(int howMany)
+{
+  while(1 < Wire.available()) // loop through all but the last
+  {
+    char c = Wire.receive(); // receive byte as a character
+    Serial.print(c);         // print the character
+  }
+  int x = Wire.receive();    // receive byte as an integer
+  Serial.println(x);         // print the integer
+}
+
+
+// *********************************************************************
+//                                                         WITH TWI ONLY
+
+
+
+// *****************************
+// * MASTER WRITE - SLAVE READ *
+// *****************************
+
+// ****** Master Writer
+#include <Wire.h>
+void setup()
+{
+  Wire.begin(); // join i2c bus (address optional for master)
+		vvvvvvvvvvvv
+		twi_init();
+		^^^^^^^^^^^^
+}
+byte x = 0;
+void loop()
+{
+  Wire.beginTransmission(4); // transmit to device #4
+  ##Wire.send("x is ");        // sends five bytes
+  ##Wire.send(x);              // sends one byte  
+  Wire.endTransmission();    // stop transmitting
+		
+  x++;
+  delay(500);
+}
+// ****** Slave Receiver Code ******
+#include <Wire.h>
+void setup()
+{
+  Wire.begin(4);                // join i2c bus with address #4
+  Wire.onReceive(receiveEvent); // register event
+  Serial.begin(9600);           // start serial for output
+}
+void loop()
+{
+  delay(100);
+}
+void receiveEvent(int howMany)
+{
+  while(1 < Wire.available()) // loop through all but the last
+  {
+    char c = Wire.receive(); // receive byte as a character
+    Serial.print(c);         // print the character
+  }
+  int x = Wire.receive();    // receive byte as an integer
+  Serial.println(x);         // print the integer
+}
+
+// *****************************
+// * MASTER READ - SLAVE WRITE *
+// *****************************
+
+// ****** Code for Master Reader ******
+#include <Wire.h>
+
+void setup()
+{
+  Wire.begin();        // join i2c bus (address optional for master)
+		vvvvvvvvvvvv
+		twi_init();
+		^^^^^^^^^^^^
+  Serial.begin(9600);  // start serial for output
+}
+
+void loop()
+{
+  Wire.requestFrom(2, 6);    // request 6 bytes from slave device #2
+		vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+		twi_readFrom(address, strData, length)
+		^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  while(##Wire.available())    // slave may send less than requested
+  {
+    char c = ##Wire.receive(); // receive a byte as character
+    Serial.print(c);         // print the character
+  }
+  delay(500);
+}
+
+// ****** Code for Slave Sender ******
+#include <Wire.h>
+
+void setup()
+{
+  Wire.begin(2);                // join i2c bus with address #2
+		vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+		twi_setAddress(2);
+		twi_attachSlaveTxEvent(OnRequest);
+		twi_attachSlaveRxEvent(OnReceive;
+		^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  Wire.onRequest(requestEvent); // register event
+		#######
+
+}
+
+void loop()
+{
+  delay(100);
+}
+
+void requestEvent()
+{
+  Wire.send("hello "); // respond with message of 6 bytes
+		vvvvvvvvvvvvvvvvvvvvvvvvvv
+		twi_transmit(str, length);
+		^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+
+

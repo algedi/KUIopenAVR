@@ -1,0 +1,56 @@
+>> SCRITTURA CHIP: inizio
+	>>	write FLASH in chip: start
+
+avrdude: AVR device initialized and ready to accept instructions
+
+Reading | ################################################## | 100% 0.01s
+
+avrdude: Device signature = 0x1e9307
+avrdude: NOTE: FLASH memory has been specified, an erase cycle will be performed
+         To disable this feature, specify the -D option.
+avrdude: erasing chip
+avrdude: reading input file "out/main.hex"
+avrdude: input file out/main.hex auto detected as Intel Hex
+avrdude: writing flash (4112 bytes):
+
+Writing | ################################################## | 100% 2.78s
+
+avrdude: 4112 bytes of flash written
+avrdude: verifying flash memory against out/main.hex:
+avrdude: load data flash data from input file out/main.hex:
+avrdude: input file out/main.hex auto detected as Intel Hex
+avrdude: input file out/main.hex contains 4112 bytes
+avrdude: reading on-chip flash data:
+
+Reading | ################################################## | 100% 2.15s
+
+avrdude: verifying ...
+avrdude: 4112 bytes of flash verified
+
+avrdude: safemode: Fuses OK
+
+avrdude done.  Thank you.
+
+		write FLASH in chip: finish
+src/main.cpp: In function ‘void setup()’:
+src/main.cpp:27: error: ‘Write’ was not declared in this scope
+src/main.cpp: In function ‘void receiveEvent(int)’:
+src/main.cpp:43: error: ‘Clear’ was not declared in this scope
+src/main.cpp:44: error: ‘Write’ was not declared in this scope
+src/main.cpp:45: error: ‘Write’ was not declared in this scope
+src/main.cpp:46: error: ‘Write’ was not declared in this scope
+src/main.cpp:52: error: ‘x’ was not declared in this scope
+src/main.cpp:54: error: ‘nCmd’ was not declared in this scope
+src/main.cpp: In function ‘void Clear()’:
+src/main.cpp:68: error: ‘Write’ was not declared in this scope
+src/main.cpp: In function ‘void setup()’:
+src/main.cpp:27: error: ‘Write’ was not declared in this scope
+src/main.cpp: In function ‘void receiveEvent(int)’:
+src/main.cpp:43: error: ‘Clear’ was not declared in this scope
+src/main.cpp:44: error: ‘Write’ was not declared in this scope
+src/main.cpp:45: error: ‘Write’ was not declared in this scope
+src/main.cpp:46: error: ‘Write’ was not declared in this scope
+src/main.cpp:52: error: ‘x’ was not declared in this scope
+src/main.cpp:54: error: ‘nCmd’ was not declared in this scope
+src/main.cpp: In function ‘void Clear()’:
+src/main.cpp:68: error: ‘Write’ was not declared in this scope

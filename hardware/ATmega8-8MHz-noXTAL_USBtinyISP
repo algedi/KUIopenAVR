@@ -1,0 +1,7 @@
+export MCU="atmega8"
+export F_CPU="8000000UL"
+export PROGRAMMER="usbtiny"
+export AVRDUDE_MCU="m8"
+export FUSE_H="0xd9"
+export FUSE_L="0xc4"
+export FUSE_X=""

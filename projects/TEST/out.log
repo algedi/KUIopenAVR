@@ -1,0 +1,16 @@
+>> COMPILAZIONE: inizio
+	>>	compile cpp source: start
+		compile cpp source: finish
+	>>	link objects src: start
+		link objects src: finish
+	>>	compile c lib: start
+		compile c lib: finish
+	>>	compile cpp lib: start
+		compile cpp lib: finish
+	>>	link objects src: start
+		link objects src: finish
+	>>	link all: start
+		link all: finish
+	>>	convert in intelHEX: start
+		convert in intelHEX: finish
+<< COMPILAZIONE: finita

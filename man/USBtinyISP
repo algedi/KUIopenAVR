@@ -1,0 +1,18 @@
+As installed by the avrdude package on Ubuntu, avrdude needs root priveledges to work properly with the Adafruit USBTinyISP  AVR programmer.  This gets annoying pretty fast because to program an AVR you need to run avrdude (or make) with sudo every time or log in as root (not recommended).  
+
+Without sudo, avrdude will return an error:
+	avrdude: error: usbtiny_transmit: error sending control message: Operation not permitted
+	avrdude: initialization failed, rc=-1
+	Double check connections and try again, or use -F to override
+
+	this check.
+
+	avrdude: error: usbtiny_transmit: error sending control message: Operation not permitted
+					avrdude done.  Thank you.
+
+THE FIX:
+
+Create a file called 10-usbtinyisp.rules in directory /etc/udev/rules.d
+	SUBSYSTEM=="usb", SYSFS{idVendor}=="1781", SYSFS{idProduct}=="0c9f", GROUP="adm", MODE="0666"
+Then execute:
+	sudo restart udev

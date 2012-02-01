@@ -1,0 +1,30 @@
+####################################################
+########                                    ########
+######         AVR Open Project               ######
+######                                        ######
+######  ------------------------------------  ######
+######                                        ######
+######            License: GPLv2              ######
+######      KUI TEAM:       algedi@tin.it     ######
+######                                        ######
+######  ------------------------------------  ######
+######                                        ######
+######        KK   KK  UU      UU  II         ######
+######        KK  KK   UU      UU  II         ######
+######        KK KK    UU      UU  II         ######
+######        KKKK     UU      UU  II         ######
+######        KK KK    UU      UU  II         ######
+######        KK  KK    UU    UU   II         ######
+######        KK   KK     UUUU     II         ######
+######                                        ######
+####################################################
+
+Il pacchetto è pensato per facilitare la programmazione degli atmel
+senza l'uso di IDE dedicati.
+
+Per funzionare devono essere installati i seguenti pacchetti:
+	avr-gcc
+	avr-c++
+	avr-libc
+	avrdude
+

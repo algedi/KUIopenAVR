@@ -1,0 +1,23 @@
+>> COMPILAZIONE: inizio
+	>>	compile cpp lib: start
+lib/KuiSlave.cpp: In static member function ‘static void KuiSlave::OnRequest()’:
+lib/KuiSlave.cpp:71: error: ‘KUI_BUS_LENGTH’ was not declared in this scope
+lib/KuiSlave.cpp:72: error: conflicting declaration ‘int nLength’
+lib/KuiSlave.cpp:70: error: ‘nLength’ has a previous declaration as ‘uint8_t nLength’
+lib/KuiSlave.cpp:72: error: ‘uuData’ was not declared in this scope
+lib/KuiSlave.cpp:72: error: too many arguments to function
+./include/KuiSlave.h:29: error: invalid use of member ‘KuiSlave::m_uAddress’ in static member function
+lib/KuiSlave.cpp:74: error: from this location
+lib/KuiSlave.cpp:75: error: ‘m_uPort’ was not declared in this scope
+lib/KuiSlave.cpp:76: error: ‘m_uCmd’ was not declared in this scope
+lib/KuiSlave.cpp: In member function ‘void KuiSlave::OnCall(uint8_t, uint8_t, uint8_t*, uint8_t)’:
+lib/KuiSlave.cpp:87: error: ‘m_uuCallArg’ was not declared in this scope
+lib/KuiSlave.cpp:88: error: ‘m_uuCallArg’ was not declared in this scope
+lib/KuiSlave.cpp:89: error: ‘m_uuCallArg’ was not declared in this scope
+lib/KuiSlave.cpp: In member function ‘void KuiSlave::SetEventRequest(uint8_t (*)(uint8_t, uint8_t, uint8_t*))’:
+lib/KuiSlave.cpp:100: error: invalid conversion from ‘uint8_t (*)(uint8_t, uint8_t, uint8_t*)’ to ‘uint8_t (*)()’
+lib/KuiSlave.cpp: At global scope:
+lib/KuiSlave.cpp:106: error: conflicting declaration ‘uint8_t (* KuiSlave::m_pEventRequest)(uint8_t, uint8_t, uint8_t*)’
+./include/KuiSlave.h:34: error: ‘KuiSlave::m_pEventRequest’ has a previous declaration as ‘uint8_t (* KuiSlave::m_pEventRequest)()’
+lib/KuiSlave.cpp:106: error: declaration of ‘uint8_t (* KuiSlave::m_pEventRequest)()’ outside of class is not definition
+*** Errore: compilazione interrotta

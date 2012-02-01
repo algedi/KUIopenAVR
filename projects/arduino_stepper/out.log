@@ -1,0 +1,32 @@
+>> SCRITTURA CHIP: inizio
+	>>	write FLASH in chip: start
+
+avrdude: AVR device initialized and ready to accept instructions
+
+Reading | ################################################## | 100% 0.01s
+
+avrdude: Device signature = 0x1e950f
+avrdude: NOTE: FLASH memory has been specified, an erase cycle will be performed
+         To disable this feature, specify the -D option.
+avrdude: erasing chip
+avrdude: reading input file "out/main.hex"
+avrdude: input file out/main.hex auto detected as Intel Hex
+avrdude: writing flash (2010 bytes):
+
+Writing | ################################################## | 100% 0.79s
+
+avrdude: 2010 bytes of flash written
+avrdude: verifying flash memory against out/main.hex:
+avrdude: load data flash data from input file out/main.hex:
+avrdude: input file out/main.hex auto detected as Intel Hex
+avrdude: input file out/main.hex contains 2010 bytes
+avrdude: reading on-chip flash data:
+
+Reading | ################################################## | 100% 0.64s
+
+avrdude: verifying ...
+avrdude: 2010 bytes of flash verified
+
+avrdude done.  Thank you.
+
+		write FLASH in chip: finish

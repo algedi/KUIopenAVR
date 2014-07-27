@@ -1,7 +1,7 @@
 
 ############################################################################
-# KUIopenAVR 0.1 - AVR compiler for arduino librery 
-# Copyright (C) 2012 - algedi@tin.it - KUI team
+# KUIopenAVR 0.1 - AVR compiler for arduino library 
+# Copyright (C) 2012  -  algedi@tin.it  -  KUI team
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,4 +17,3 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ############################################################################
 
-aaa
